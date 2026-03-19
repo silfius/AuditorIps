@@ -1,0 +1,13 @@
+
+
+- Al final del proyecto, quiero que haya una opcion de reset de fabrica. Osea, quiero decir, que si clico ese boton, se borre toda la informacione especifica y haya un asistente para configurar:
+   - Usuario Administrador / password
+   - Apartados a mostrar
+   - Red inicial
+   - Apartados a mostrar (puede que el usuario no quiera las opciones como "Calidad", "Procesos", Servicios) En tal caso, esas opciones se deberian ocultar, y solo mostrar en el config para seleccionar si se quieren mostrar o no. Por si en el futuro, el usuario lo quiere usar
+
+Me gustaria que la lista de host se pueda ver, a eleccion, dividida en funcion de la red. Una lista por red. Por ejemplo, como si fuese un arbol, y del rango de IP salgan los equipos conectados. Es viable
+COSAS CONFIGURABLES a cambiar:
+- Si tiene conexion a router ssh, elegir si el scan de host sera por nmap o router
+- El scan secundario (sea nmap o router) sea programable (definir intervalo o no)  -> Añadiria analisis IA para potenciar resultados, contrastando con el scaneo principal
+- Deberia cambiar el boton de Analisis router por verificacion alternativa o algo mejor (sugerencias por favor)

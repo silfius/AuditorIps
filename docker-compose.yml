@@ -1,0 +1,35 @@
+services:
+  auditor_ips:
+    build: ./app
+    container_name: auditor_ips
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    env_file:
+      - .env
+    environment:
+      - SCAN_CIDR=192.168.1.0/24
+      - SCAN_INTERVAL_SECONDS=300
+      - PORT=8088
+      - DNS_SERVER=192.168.1.252
+      - DB_PATH=/data/auditor.db
+      - SERVER_IP=192.168.1.50
+      # ── Router SSH ─────────────────────────────────────────
+      - ROUTER_SSH_HOST=192.168.1.1
+      - ROUTER_SSH_PORT=1999
+      - ROUTER_SSH_USER=cpueyo_admin
+      - ROUTER_SSH_KEY=/app/router_key
+      - SCRIPTS_STATUS_DIR=/data/scripts_status
+      # ── IA local Ollama (Sesión 13) ────────────────────────
+      - OLLAMA_URL=http://localhost:11434
+      - OLLAMA_MODEL=gemma2:2b
+    volumes:
+      - /SERVER/VM/Auditor_IPs/data:/data
+      # Clave SSH para el router (el archivo debe tener chmod 600)
+      - /home/cpueyo/.ssh/router_auditor:/app/router_key:ro
+      - /SERVER/Logs_scripts_General:/data/scripts_status:ro
+      - /SERVER/AlmacenExt/Backups_Completos/SERVIDOR/ScriptsServidor/Linux/monitorizacion_scripts/Documentacion:/data/scripts_prompts:ro
+      - /SERVER/VM/Auditor_IPs/Documentacion:/data/auditor_docs:ro
+      - /SERVER/VM/Auditor_IPs/exports:/data/exports
+    restart: unless-stopped

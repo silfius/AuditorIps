@@ -1,0 +1,223 @@
+{
+  "main": {
+    "id": "13b0b634558a7ae0",
+    "type": "split",
+    "children": [
+      {
+        "id": "b0c39a861818f8f3",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7f571c85cfc3e31f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Correcciones_pendientes.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Correcciones_pendientes"
+            }
+          },
+          {
+            "id": "a7bc3a63b0673bb2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Correcciones_pendientes.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Correcciones_pendientes"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4b7665a17dc4aac3",
+    "type": "split",
+    "children": [
+      {
+        "id": "f8da68a4a01b2441",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8d6b25272a78d94e",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de fitxers"
+            }
+          },
+          {
+            "id": "fa854418ee063338",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Cerca"
+            }
+          },
+          {
+            "id": "3c063f5239f4957e",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Marcadors"
+            }
+          },
+          {
+            "id": "72d93500db4d0cb5",
+            "type": "leaf",
+            "state": {
+              "type": "mk-path-view",
+              "state": {},
+              "icon": "layout-grid",
+              "title": "Navigator"
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "863e40ea4b83ea9b",
+    "type": "split",
+    "children": [
+      {
+        "id": "f12decdf91552af7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ee2041fa0c7132d3",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Correcciones_pendientes.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Retroenllaços per a Correcciones_pendientes"
+            }
+          },
+          {
+            "id": "7370b93b9529fa34",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Correcciones_pendientes.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Enllaços sortints de Correcciones_pendientes"
+            }
+          },
+          {
+            "id": "c006650a72e91fae",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetes"
+            }
+          },
+          {
+            "id": "18cbd0aca9b1c425",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Totes les propietats"
+            }
+          },
+          {
+            "id": "f2f70cffa876504c",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Correcciones_pendientes.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Esquema de Correcciones_pendientes"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Obre el selector ràpid": false,
+      "graph:Obre la vista gràfica": false,
+      "canvas:Crea un llenç nou": false,
+      "daily-notes:Obre la nota d'avui": false,
+      "templates:Inserir plantilla": false,
+      "command-palette:Obre la paleta d'ordres": false,
+      "bases:Crea una base nova": false,
+      "obsidian-excalidraw-plugin:New drawing": false
+    }
+  },
+  "active": "a7bc3a63b0673bb2",
+  "lastOpenFiles": [
+    "Pasted image 20260315111559.png",
+    "Pasted image 20260315111546.png",
+    "Pasted image 20260315111535.png",
+    "Tags",
+    "Correcciones_pendientes.md",
+    "Sense títol.base",
+    "Sense títol 1.base"
+  ]
+}

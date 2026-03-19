@@ -1,0 +1,8 @@
+###Remontar servicio y levantar
+docker compose build  --no-cache&& docker compose up -d
+
+###Probar servicio sin levantar. Chequeo correcto funcionamiento (se ha de hacer con servicio parado)
+docker compose run --rm auditor_ips python check_startup.py
+
+###Verificación de los endpoints (/routes)
+python3 test_endpoints.py --base https://localhost:8088 --no-verify-ssl

@@ -1,0 +1,212 @@
+"""
+config.py — Auditor IPs
+Settings runtime-mutables cargados desde la BD y sobreescritos por .env.
+Rate limiter en memoria para el endpoint de login.
+
+Los routers importan: cfg(), save_setting(), load_settings(), login_rate_limiter
+"""
+
+import os
+import threading
+import time
+from collections import defaultdict
+from typing import Any, Dict, List
+
+# ══════════════════════════════════════════════════════════════
+#  Variables de entorno (valores por defecto)
+# ══════════════════════════════════════════════════════════════
+
+DB_PATH               = os.getenv("DB_PATH",               "/data/auditor.db")
+SCAN_CIDR             = os.getenv("SCAN_CIDR",             "192.168.1.0/24")
+SCAN_INTERVAL_SECONDS = int(os.getenv("SCAN_INTERVAL_SECONDS", "900"))
+DNS_SERVER            = os.getenv("DNS_SERVER",            "").strip()
+
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
+NOTIFY_NEW          = os.getenv("NOTIFY_NEW",    "1").strip() == "1"
+NOTIFY_ONLINE       = os.getenv("NOTIFY_ONLINE", "0").strip() == "1"
+NOTIFY_OFFLINE      = os.getenv("NOTIFY_OFFLINE","0").strip() == "1"
+NOTIFY_MAC_CHANGE   = os.getenv("NOTIFY_MAC_CHANGE","0").strip() == "1"
+
+RETENTION_DAYS = int(os.getenv("SCAN_RETENTION_DAYS", "14"))
+WOL_PORT       = int(os.getenv("WOL_PORT", "9"))
+WOL_BROADCAST  = os.getenv("WOL_BROADCAST", "").strip()
+
+ROUTER_SSH_HOST = os.getenv("ROUTER_SSH_HOST", "192.168.1.1").strip()
+ROUTER_SSH_PORT = int(os.getenv("ROUTER_SSH_PORT", "22"))
+ROUTER_SSH_USER = os.getenv("ROUTER_SSH_USER", "").strip()
+ROUTER_SSH_KEY  = os.getenv("ROUTER_SSH_KEY",  "").strip()
+
+
+# ══════════════════════════════════════════════════════════════
+#  Settings runtime (_cfg)
+# ══════════════════════════════════════════════════════════════
+
+_cfg: Dict[str, Any] = {}
+_cfg_lock = threading.Lock()
+
+
+def cfg_defaults() -> Dict[str, Any]:
+    """Valores por defecto derivados de variables de entorno."""
+    return {
+        "scan_cidr":           SCAN_CIDR,
+        "scan_interval":       str(SCAN_INTERVAL_SECONDS),
+        "dns_server":          DNS_SERVER,
+        "discord_webhook":     DISCORD_WEBHOOK_URL,
+        "notify_new":          "1" if NOTIFY_NEW else "0",
+        "notify_online":       "1" if NOTIFY_ONLINE else "0",
+        "notify_offline":      "1" if NOTIFY_OFFLINE else "0",
+        "notify_mac_change":   "1" if NOTIFY_MAC_CHANGE else "0",
+        "notify_service_down": "1",
+        "push_new":            "1",
+        "push_offline":        "1",
+        "push_online":         "0",
+        "push_service_down":   "1",
+        "push_mac_change":     "1",
+        "retention_days":      str(RETENTION_DAYS),
+        "wol_port":            str(WOL_PORT),
+        "wol_broadcast":       WOL_BROADCAST,
+        "app_tz":              "Europe/Madrid",
+        "theme":               "dark",
+        "page_title":          "Auditor IPs",
+        "accent_color":        "#4dffb5",
+        "accent_color2":       "#375a7f",
+        "vapid_public_key":    "",
+        "backup_enabled":      "1",
+        "backup_keep":         "7",
+        # Router SSH
+        "router_enabled":      "0",
+        "router_ssh_host":     ROUTER_SSH_HOST,
+        "router_ssh_port":     str(ROUTER_SSH_PORT),
+        "router_ssh_user":     ROUTER_SSH_USER,
+        "router_ssh_key":      ROUTER_SSH_KEY,
+        # Auth
+        "auth_sections":       "config,alertas",
+        # Pestañas ocultas (csv de tab IDs: services,quality,groups,alerts,scripts)
+        "hidden_tabs":         "",
+        # Idioma de la interfaz
+        "ui_lang":             "es",
+        # WoL sin autenticación
+        "wol_public":          "0",
+        # SMTP email
+        "smtp_enabled":        "0",
+        "smtp_host":           "",
+        "smtp_port":           "587",
+        "smtp_tls":            "starttls",
+        "smtp_user":           "",
+        "smtp_pass":           "",
+        "smtp_to":             "",
+        "smtp_from":           "",
+        # IA local / cloud
+        "ai_provider":         os.getenv("AI_PROVIDER",    "gemini"),
+        "ai_gemini_key":       os.getenv("GEMINI_API_KEY", ""),
+        "ai_gemini_model":     os.getenv("GEMINI_MODEL",   "gemini-2.0-flash"),
+    }
+
+
+def load_settings() -> None:
+    """
+    Carga settings desde la BD en _cfg, con fallback a cfg_defaults().
+    Siembra en la BD las keys que falten.
+    Import local de database.db() para evitar dependencia circular al nivel de módulo.
+    """
+    global _cfg
+    from database import db  # import local — evita ciclo database ↔ config
+
+    defaults = cfg_defaults()
+    with _cfg_lock:
+        _cfg = dict(defaults)
+        try:
+            with db() as conn:
+                rows = conn.execute("SELECT key, value FROM settings").fetchall()
+                for r in rows:
+                    _cfg[r["key"]] = r["value"]
+                # Sembrar keys que no existan todavía
+                for k, v in defaults.items():
+                    conn.execute(
+                        "INSERT OR IGNORE INTO settings (key, value) VALUES (?,?)", (k, v)
+                    )
+        except Exception:
+            pass  # Si la BD no está lista, usamos los defaults
+
+
+def cfg(key: str, default: Any = None) -> Any:
+    """Lee un setting del cache en memoria."""
+    return _cfg.get(key, default)
+
+
+def save_setting(key: str, value: str) -> None:
+    """Persiste un setting en BD y actualiza el cache."""
+    from database import db  # import local
+
+    with _cfg_lock:
+        _cfg[key] = value
+    with db() as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES (?,?)", (key, value)
+        )
+
+
+# ══════════════════════════════════════════════════════════════
+#  Rate limiter de login (en memoria)
+# ══════════════════════════════════════════════════════════════
+#
+#  Protección antes de que Fail2ban entre en juego (sesión 12).
+#  Límite: MAX_ATTEMPTS intentos fallidos en WINDOW_SECONDS → 429.
+#  No persiste entre reinicios — aceptable para LAN.
+#  Thread-safe mediante lock.
+
+_LOGIN_MAX_ATTEMPTS = 10      # intentos fallidos permitidos
+_LOGIN_WINDOW_SECS  = 300     # ventana de tiempo (5 minutos)
+_LOGIN_BAN_SECS     = 300     # duración del bloqueo tras superar el límite
+
+_login_attempts: Dict[str, List[float]] = defaultdict(list)
+_login_banned:   Dict[str, float]       = {}   # ip → timestamp de desbloqueo
+_login_lock      = threading.Lock()
+
+
+def login_check_and_record(ip: str, success: bool) -> bool:
+    """
+    Comprueba si la IP está bloqueada y registra el intento.
+
+    - Si success=True, limpia el historial de la IP (login correcto).
+    - Si success=False, añade timestamp al historial y evalúa bloqueo.
+
+    Devuelve True si la IP está BLOQUEADA (debe rechazarse con 429).
+    """
+    now = time.monotonic()
+    with _login_lock:
+        # ¿Está baneada?
+        if ip in _login_banned:
+            if now < _login_banned[ip]:
+                return True  # Sigue bloqueada
+            else:
+                del _login_banned[ip]
+                _login_attempts[ip] = []
+
+        if success:
+            _login_attempts[ip] = []
+            return False
+
+        # Registrar fallo — limpiar intentos fuera de la ventana
+        attempts = [t for t in _login_attempts[ip] if now - t < _LOGIN_WINDOW_SECS]
+        attempts.append(now)
+        _login_attempts[ip] = attempts
+
+        if len(attempts) >= _LOGIN_MAX_ATTEMPTS:
+            _login_banned[ip] = now + _LOGIN_BAN_SECS
+            return True
+
+        return False
+
+
+def login_retry_after(ip: str) -> int:
+    """
+    Devuelve los segundos que quedan de bloqueo para la IP.
+    Devuelve 0 si no está bloqueada.
+    """
+    now = time.monotonic()
+    with _login_lock:
+        if ip in _login_banned:
+            remaining = _login_banned[ip] - now
+            return max(0, int(remaining))
+    return 0

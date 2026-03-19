@@ -1,0 +1,59 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# =========================
+# Entornos virtuales
+# =========================
+venv/
+.env
+.env.*
+
+# =========================
+# Base de datos SQLite
+# =========================
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# =========================
+# Backups
+# =========================
+data/backups/
+
+# =========================
+# Exportaciones
+# =========================
+data/exports/
+exports/
+
+# =========================
+# Certificados (CRÍTICO)
+# =========================
+data/certs/*.key
+data/certs/*.crt
+data/certs/*.csr
+data/certs/*.srl
+
+# =========================
+# Runtime / estado
+# =========================
+data/scripts_status/
+data/ssh_known_hosts
+
+# =========================
+# Archivos temporales
+# =========================
+*.tmp
+*.bak
+*.swp
+
+# =========================
+# Opcional (ajusta si quieres)
+# =========================
+app/PATCH_main.py.txt

@@ -1,0 +1,25 @@
+DISCORD_WEBHOOK_URL=
+NOTIFY_NEW=1
+NOTIFY_ONLINE=0
+NOTIFY_OFFLINE=0
+NOTIFY_MAC_CHANGE=0
+SCAN_RETENTION_DAYS=14
+
+# ── Autenticación Admin (Sesión 5) ─────────────────────────
+# Hash PBKDF2-HMAC-SHA256 de la contraseña admin.
+# Generarlo con:
+#   python3 -c "
+#   import os, hashlib
+#   pw = input('Contraseña: ').encode()
+#   salt = os.urandom(16)
+#   dk = hashlib.pbkdf2_hmac('sha256', pw, salt, 310_000)
+#   print(salt.hex() + '\$' + dk.hex())
+#   "
+# Si se deja vacío, la autenticación queda DESHABILITADA (acceso libre total).
+ADMIN_PASSWORD_HASH=
+
+# Duración de la sesión admin en horas (por defecto 8)
+SESSION_TTL_HOURS=8
+
+# IPs que no se registran en el audit log (separadas por coma, opcional)
+# AUDIT_SKIP_IPS=127.0.0.1,192.168.1.50
